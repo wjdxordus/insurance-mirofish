@@ -233,8 +233,13 @@ docker compose up -d
 Railway에서는 `railway.json`을 통해 Dockerfile 기반 빌드/배포가 자동 적용됩니다.
 
 1. Railway 프로젝트 생성 후 이 GitHub 저장소를 연결합니다.
-2. Variables에 `.env`의 필수 값(`LLM_*`, `ZEP_API_KEY` 등)을 등록합니다.
-3. Deploy를 실행하면 Railway가 `PORT`를 주입하고, 앱은 해당 포트에서 `/health`로 헬스체크에 응답합니다.
+2. Variables에 `.env` 값을 등록합니다(일괄 붙여넣기 가능).
+   - 권장 필수: `ZEP_API_KEY`, `OPENCODE_REMOTE_SERVER_URL`, `OPENCODE_REMOTE_SERVER_USERNAME`, `OPENCODE_REMOTE_SERVER_PASSWORD`
+   - 선택: `OPENCODE_REMOTE_MODEL_PROVIDER_ID`, `OPENCODE_REMOTE_MODEL_ID`, `OPENCODE_REMOTE_PROXY_PORT`
+3. Deploy를 실행하면 컨테이너 내부에서 OpenCode proxy + backend가 함께 실행됩니다.
+   backend의 `LLM_BASE_URL`은 기본적으로 `http://127.0.0.1:${OPENCODE_REMOTE_PROXY_PORT:-4098}/v1`를 사용하고,
+   해당 proxy가 `OPENCODE_REMOTE_SERVER_URL`로 포워딩합니다.
+4. Railway가 `PORT`를 주입하고, 앱은 해당 포트에서 `/health`로 헬스체크에 응답합니다.
 
 접속은 Railway가 할당한 도메인으로 하며, API와 프론트가 동일 도메인/포트에서 함께 동작합니다.
 

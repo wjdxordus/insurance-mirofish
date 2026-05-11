@@ -18,14 +18,21 @@ ENV PYTHONUNBUFFERED=1 \
     FLASK_HOST=0.0.0.0 \
     FLASK_DEBUG=False
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY backend/pyproject.toml backend/uv.lock ./backend/
 RUN cd backend && uv sync --frozen --no-install-project
 
 COPY backend ./backend
+COPY scripts ./scripts
 COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+RUN chmod +x /app/scripts/start-railway.sh
 
 RUN mkdir -p backend/uploads/projects backend/uploads/simulations backend/uploads/reports
 
 EXPOSE 5001
 
-CMD ["sh", "-c", "cd backend && uv run python run.py"]
+CMD ["sh", "/app/scripts/start-railway.sh"]
