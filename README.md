@@ -222,9 +222,21 @@ cp .env.example .env
 docker compose up -d
 ```
 
-기본적으로 루트 디렉터리의 `.env`를 읽고, 포트 `3001（프론트엔드）/5001（백엔드）`를 매핑합니다
+기본적으로 루트 디렉터리의 `.env`를 읽고, 포트 `5001`로 서비스합니다.
+프론트엔드 정적 파일은 백엔드(Flask)가 함께 서빙합니다.
 
 > `docker-compose.yml`에 주석으로 가속 미러 주소를 제공해두었으며, 필요에 따라 교체할 수 있습니다
+
+### 3) Railway 배포 (단일 Docker 이미지)
+
+이 저장소는 루트 `Dockerfile` 하나로 프론트엔드 빌드 + 백엔드 실행까지 처리합니다.
+Railway에서는 `railway.json`을 통해 Dockerfile 기반 빌드/배포가 자동 적용됩니다.
+
+1. Railway 프로젝트 생성 후 이 GitHub 저장소를 연결합니다.
+2. Variables에 `.env`의 필수 값(`LLM_*`, `ZEP_API_KEY` 등)을 등록합니다.
+3. Deploy를 실행하면 Railway가 `PORT`를 주입하고, 앱은 해당 포트에서 `/health`로 헬스체크에 응답합니다.
+
+접속은 Railway가 할당한 도메인으로 하며, API와 프론트가 동일 도메인/포트에서 함께 동작합니다.
 
 ## 📬 더 많은 소통
 
