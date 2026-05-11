@@ -29,10 +29,18 @@ fi
 export OPENCODE_PROXY_PORT="${OPENCODE_REMOTE_PROXY_PORT:-${OPENCODE_PROXY_PORT:-4098}}"
 export OPENCODE_NGROK_SKIP_BROWSER_WARNING="${OPENCODE_NGROK_SKIP_BROWSER_WARNING:-1}"
 
-# Backend should call local proxy in-container, unless explicitly overridden.
-export LLM_API_KEY="${LLM_API_KEY:-opencode-remote}"
-export LLM_BASE_URL="${LLM_BASE_URL:-http://127.0.0.1:${OPENCODE_PROXY_PORT}/v1}"
-export LLM_MODEL_NAME="${LLM_MODEL_NAME:-${OPENCODE_MODEL_ID:-gpt-5.2}}"
+# In remote mode, force backend traffic through in-container proxy to avoid
+# stale pasted values (e.g. LLM_BASE_URL=...4097) causing runtime 500 errors.
+if [ -n "${OPENCODE_REMOTE_SERVER_URL:-}" ]; then
+  export LLM_API_KEY="${LLM_API_KEY:-opencode-remote}"
+  export LLM_BASE_URL="http://127.0.0.1:${OPENCODE_PROXY_PORT}/v1"
+  export LLM_MODEL_NAME="${OPENCODE_REMOTE_MODEL_ID:-${OPENCODE_MODEL_ID:-${LLM_MODEL_NAME:-gpt-5.2}}}"
+else
+  # Non-remote mode: keep compatibility with explicit LLM_* overrides.
+  export LLM_API_KEY="${LLM_API_KEY:-opencode-remote}"
+  export LLM_BASE_URL="${LLM_BASE_URL:-http://127.0.0.1:${OPENCODE_PROXY_PORT}/v1}"
+  export LLM_MODEL_NAME="${LLM_MODEL_NAME:-${OPENCODE_MODEL_ID:-gpt-5.2}}"
+fi
 
 cd "$ROOT"
 

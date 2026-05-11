@@ -33,6 +33,6 @@ RUN chmod +x /app/scripts/start-railway.sh
 
 RUN mkdir -p backend/uploads/projects backend/uploads/simulations backend/uploads/reports
 
-EXPOSE 5001
+EXPOSE 8080
 
 CMD ["sh", "/app/scripts/start-railway.sh"]
